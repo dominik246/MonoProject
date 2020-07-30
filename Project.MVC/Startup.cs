@@ -27,8 +27,7 @@ namespace Project.MVC
             {
                 options.UseSqlServer(Configuration.GetConnectionString("default"));
             });
-            services.AddTransient<IVehicleService<VehicleMake>, VehicleService<VehicleMake>>();
-            services.AddTransient<IVehicleService<VehicleModel>, VehicleService<VehicleModel>>();
+            services.AddScoped(typeof(IVehicleService<>), typeof(VehicleService<>));
             services.AddControllersWithViews();
         }
 
