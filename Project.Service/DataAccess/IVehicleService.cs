@@ -1,7 +1,5 @@
 ﻿using Project.Service.Models;
 
-using System;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Project.Service.DataAccess
@@ -10,8 +8,7 @@ namespace Project.Service.DataAccess
     {
         Task CreateAsync(TModel entity);
         Task DeleteAsync(int id);
-        Task<PagedResult<TModel>> GetAsync(string sortBy = "Id", int page = 1, int pageLength = 10);
-        Task<PagedResult<TModel>> GetFilteredAsync(Expression<Func<TModel, bool>> filter, string sortBy = "Id", int page = 1, int pageLength = 10);
+        Task<PagedResult<TModel>> FindAsync(string searchString, string sortBy, int page = 1, int pageLength = 10);
         Task<TModel> GetByIdAsync(int id);
         Task UpdateAsync(TModel entity);
     }

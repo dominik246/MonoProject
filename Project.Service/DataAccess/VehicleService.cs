@@ -2,9 +2,6 @@
 
 using Project.Service.Models;
 
-using System;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 namespace Project.Service.DataAccess
 {
@@ -16,27 +13,9 @@ namespace Project.Service.DataAccess
             _db = db;
         }
 
-        public async Task<PagedResult<TModel>> GetAsync(string sortBy = "Id", int page = 1, int pageLength = 10)
+        public async Task<PagedResult<TModel>> FindAsync(string searchString, string sortBy, int page, int pageLength)
         {
-
-            return sortBy switch
-            {
-                "Name" => await Task.FromResult(_db.Set<TModel>().OrderBy(s => s.Name).AsNoTracking().GetPaged(page, pageLength)),
-                "Id" => await Task.FromResult(_db.Set<TModel>().OrderBy(s => s.Id).AsNoTracking().GetPaged(page, pageLength)),
-                "Abrv" => await Task.FromResult(_db.Set<TModel>().OrderBy(s => s.Abrv).AsNoTracking().GetPaged(page, pageLength)),
-                _ => await Task.FromResult(_db.Set<TModel>().AsNoTracking().GetPaged(page, pageLength))
-            };
-        }
-
-        public async Task<PagedResult<TModel>> GetFilteredAsync(Expression<Func<TModel, bool>> filter, string sortBy = "Id", int page = 1, int pageLength = 10)
-        {
-            return sortBy switch
-            {
-                "Name" => await Task.FromResult(_db.Set<TModel>().Where(filter).OrderBy(s => s.Name).AsNoTracking().GetPaged(page, pageLength)),
-                "Id" => await Task.FromResult(_db.Set<TModel>().Where(filter).OrderBy(s => s.Id).AsNoTracking().GetPaged(page, pageLength)),
-                "Abrv" => await Task.FromResult(_db.Set<TModel>().Where(filter).OrderBy(s => s.Abrv).AsNoTracking().GetPaged(page, pageLength)),
-                _ => await Task.FromResult(_db.Set<TModel>().Where(filter).AsNoTracking().GetPaged(page, pageLength))
-            };
+            return await Task.FromResult(_db.Set<TModel>().GetFiltered(searchString).GetSorted(sortBy).AsNoTracking().GetPaged(page, pageLength));
         }
 
         public async Task<TModel> GetByIdAsync(int id)
