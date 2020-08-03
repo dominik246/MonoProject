@@ -14,10 +14,13 @@
     <Compile Remove="Migrations\20200728212145_Initial.Designer.cs" />
     <Compile Remove="Migrations\20200728212444_Initial.cs" />
     <Compile Remove="Migrations\20200728212444_Initial.Designer.cs" />
+    <Compile Remove="Migrations\20200803184854_FluentApi.cs" />
+    <Compile Remove="Migrations\20200803184854_FluentApi.Designer.cs" />
+    <Compile Remove="Migrations\20200803190700_FK.cs" />
+    <Compile Remove="Migrations\20200803190700_FK.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ErikEJ.EntityFrameworkCore.DgmlBuilder" Version="3.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0-preview.7.20365.15" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.0-preview.7.20365.15">
       <PrivateAssets>all</PrivateAssets>

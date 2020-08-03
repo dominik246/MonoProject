@@ -14,7 +14,7 @@ namespace Project.Service.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .UseIdentityColumns()
+                .UseIdentityColumns(1, 1)
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.0-preview.7.20365.15");
 
@@ -23,7 +23,7 @@ namespace Project.Service.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .UseIdentityColumn(1, 1);
 
                     b.Property<string>("Abrv")
                         .IsRequired()
@@ -45,7 +45,7 @@ namespace Project.Service.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .UseIdentityColumn();
+                        .UseIdentityColumn(1, 1);
 
                     b.Property<string>("Abrv")
                         .IsRequired()

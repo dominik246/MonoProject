@@ -21,6 +21,6 @@ namespace Project.Service.Models
         [Display(Name = "Abbreviation")]
         public string Abrv { get; set; }
 
-        public ICollection<VehicleModel> VehicleModels { get; set; }
+        public ICollection<VehicleModel> VehicleModelCollection { get; set; }
     }
 }
