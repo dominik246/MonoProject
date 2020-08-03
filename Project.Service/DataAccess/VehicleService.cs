@@ -15,10 +15,10 @@ namespace Project.Service.DataAccess
 
         public async Task<PagedResult<TModel>> FindAsync(string searchString, string sortBy, int page, int pageLength)
         {
-            return await Task.FromResult(_db.Set<TModel>().GetFiltered(searchString).GetSorted(sortBy).AsNoTracking().GetPaged(page, pageLength));
+            return await _db.Set<TModel>().GetFiltered(searchString).GetSorted(sortBy).AsNoTracking().GetPagedAsync(page, pageLength);
         }
 
-        public async Task<TModel> GetByIdAsync(int id)
+        public async Task<TModel> GetAsync(int? id)
         {
             return await _db.Set<TModel>().AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
         }

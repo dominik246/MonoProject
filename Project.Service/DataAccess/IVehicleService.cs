@@ -9,7 +9,7 @@ namespace Project.Service.DataAccess
         Task CreateAsync(TModel entity);
         Task DeleteAsync(int id);
         Task<PagedResult<TModel>> FindAsync(string searchString, string sortBy, int page = 1, int pageLength = 10);
-        Task<TModel> GetByIdAsync(int id);
+        Task<TModel> GetAsync(int? id);
         Task UpdateAsync(TModel entity);
     }
 }

@@ -1,13 +1,16 @@
-﻿using Project.Service.Models;
+﻿using Microsoft.EntityFrameworkCore;
+
+using Project.Service.Models;
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Project.Service.DataAccess
 {
     public static class IQueryableExtensions
     {
-        public static PagedResult<T> GetPaged<T>(this IQueryable<T> query, int page, int pageSize) where T : class
+        public static async Task<PagedResult<T>> GetPagedAsync<T>(this IQueryable<T> query, int page, int pageSize) where T : class
         {
             var result = new PagedResult<T>
             {
@@ -21,7 +24,7 @@ namespace Project.Service.DataAccess
             result.PageCount = (int)Math.Ceiling(pageCount);
 
             var skip = (page - 1) * pageSize;
-            result.Results = query.Skip(skip).Take(pageSize).ToList();
+            result.Results = await query.Skip(skip).Take(pageSize).ToListAsync();
 
             return result;
         }
@@ -39,7 +42,11 @@ namespace Project.Service.DataAccess
 
         public static IQueryable<T> GetFiltered<T>(this IQueryable<T> query, string searchString) where T : class, IModel
         {
-            return query.Where(s => s.Abrv.Contains(searchString) || s.Name.Contains(searchString));
+            if(!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(s => s.Abrv.Contains(searchString) || s.Name.Contains(searchString));
+            }
+            return query;
         }
     }
 }

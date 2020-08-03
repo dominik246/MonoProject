@@ -5,16 +5,19 @@ namespace Project.Service.Models
 {
     public class VehicleMake : IModel
     {
+        [Display(Name = "ID")]
         public int Id { get; set; }
 
         [Required]
         [MaxLength(50)]
         [Column(TypeName = "nvarchar(50)")]
+        [Display(Name = "Make Name")]
         public string Name { get; set; }
 
         [Required]
         [MaxLength(20)]
         [Column(TypeName = "nvarchar(20)")]
+        [Display(Name = "Abbreviation")]
         public string Abrv { get; set; }
     }
 }
