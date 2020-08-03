@@ -6,12 +6,12 @@ namespace Project.Service.Models
     public class VehicleModel : IModel
     {
         [Display(Name = "ID")]
+        [Key]
         public int Id { get; set; }
 
         public virtual VehicleMake VehicleMake { get; set; }
 
         [Display(Name = "Make Name")]
-        [ForeignKey("VehicleMake")]
         public int MakeId { get; set; }
 
         [Required]

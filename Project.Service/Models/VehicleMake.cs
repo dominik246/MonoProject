@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Project.Service.Models
@@ -19,5 +20,7 @@ namespace Project.Service.Models
         [Column(TypeName = "nvarchar(20)")]
         [Display(Name = "Abbreviation")]
         public string Abrv { get; set; }
+
+        public ICollection<VehicleModel> VehicleModels { get; set; }
     }
 }

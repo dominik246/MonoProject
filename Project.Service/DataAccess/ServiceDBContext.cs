@@ -10,5 +10,14 @@ namespace Project.Service.DataAccess
 
         public DbSet<VehicleMake> VehicleMakes { get; set; }
         public DbSet<VehicleModel> VehicleModels { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<VehicleModel>()
+                .HasOne(s => s.VehicleMake)
+                .WithMany(s => s.VehicleModels)
+                .HasForeignKey(s => s.MakeId)
+                .OnDelete(DeleteBehavior.Cascade);
+        }
     }
 }
