@@ -1,28 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 using Project.Service.DataAccess;
 using Project.Service.Models;
+
+using System.Threading.Tasks;
 
 namespace Project.MVC.Controllers
 {
     public class VehicleMakesController : Controller
     {
-        private readonly IVehicleService<VehicleMake> _service;
+        private readonly IVehicleService<VehicleMake> _make;
 
-        public VehicleMakesController(IVehicleService<VehicleMake> service)
+        public VehicleMakesController(IVehicleService<VehicleMake> make)
         {
-            _service = service;
+            _make = make;
         }
 
         // GET: VehicleMakes
         public async Task<IActionResult> Index()
         {
-            return View(await (await _service.FindAsync("", "Id")).Results.ToListAsync());
+            return View(await (await _make.FindAsync("", "Id")).Results.ToListAsync());
         }
 
         // GET: VehicleMakes/Details/5
@@ -33,7 +31,7 @@ namespace Project.MVC.Controllers
                 return NotFound();
             }
 
-            var vehicleMake = await _service.GetAsync(id);
+            var vehicleMake = await _make.GetAsync(id);
             if (vehicleMake == null)
             {
                 return NotFound();
@@ -57,7 +55,7 @@ namespace Project.MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _service.CreateAsync(vehicleMake);
+                await _make.CreateAsync(vehicleMake);
                 return RedirectToAction(nameof(Index));
             }
             return View(vehicleMake);
@@ -71,7 +69,7 @@ namespace Project.MVC.Controllers
                 return NotFound();
             }
 
-            var vehicleMake = await _service.GetAsync(id);
+            var vehicleMake = await _make.GetAsync(id);
             if (vehicleMake == null)
             {
                 return NotFound();
@@ -93,7 +91,7 @@ namespace Project.MVC.Controllers
 
             if (ModelState.IsValid)
             {
-                await _service.UpdateAsync(vehicleMake);
+                await _make.UpdateAsync(vehicleMake);
                 return RedirectToAction(nameof(Index));
             }
             return View(vehicleMake);
@@ -107,7 +105,7 @@ namespace Project.MVC.Controllers
                 return NotFound();
             }
 
-            var vehicleMake = await _service.GetAsync(id);
+            var vehicleMake = await _make.GetAsync(id);
             if (vehicleMake == null)
             {
                 return NotFound();
@@ -121,7 +119,7 @@ namespace Project.MVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _service.DeleteAsync(id);
+            await _make.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
     }

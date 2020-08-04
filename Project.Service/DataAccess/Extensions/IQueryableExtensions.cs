@@ -1,10 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-using Project.Service.Models;
+﻿using Project.Service.Models;
 
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Project.Service.DataAccess
 {
@@ -42,7 +39,7 @@ namespace Project.Service.DataAccess
 
         public static IQueryable<T> GetFiltered<T>(this IQueryable<T> query, string searchString) where T : class, IModel
         {
-            if(!string.IsNullOrEmpty(searchString))
+            if (!string.IsNullOrEmpty(searchString))
             {
                 query = query.Where(s => s.Abrv.Contains(searchString) || s.Name.Contains(searchString));
             }

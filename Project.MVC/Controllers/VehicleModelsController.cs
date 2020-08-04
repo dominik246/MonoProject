@@ -1,29 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using Project.Service.DataAccess;
 using Project.Service.Models;
+
+using System.Threading.Tasks;
 
 namespace Project.MVC.Controllers
 {
     public class VehicleModelsController : Controller
     {
-        private readonly IVehicleService<VehicleModel> _service;
+        private readonly IVehicleService<VehicleModel> _model;
+        private readonly IVehicleService<VehicleMake> _make;
 
-        public VehicleModelsController(IVehicleService<VehicleModel> service)
+        public VehicleModelsController(IVehicleService<VehicleModel> model, IVehicleService<VehicleMake> make)
         {
-            _service = service;
+            _model = model;
+            _make = make;
         }
 
         // GET: VehicleModels
         public async Task<IActionResult> Index()
         {
-            var serviceDBContext = (await _service.FindAsync("", "Id")).Results.Include(v => v.SelectedVehicleMake);
-            return View(await serviceDBContext.ToListAsync());
+            var result = (await _model.FindAsync("", "Id")).Results.Include(v => v.SelectedVehicleMake);
+            return View(await result.ToListAsync());
         }
 
         // GET: VehicleModels/Details/5
@@ -34,7 +35,14 @@ namespace Project.MVC.Controllers
                 return NotFound();
             }
 
-            var vehicleModel = await _service.GetAsync(id);
+            var vehicleModel = await (await _model.FindAsync("", "Id")).Results
+                .Include(v => v.SelectedVehicleMake)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (vehicleModel == null)
+            {
+                return NotFound();
+            }
 
             return View(vehicleModel);
         }
@@ -42,8 +50,8 @@ namespace Project.MVC.Controllers
         // GET: VehicleModels/Create
         public async Task<IActionResult> Create()
         {
-            var result = await (await _service.FindAsync("", "Id")).Results.Include(v => v.SelectedVehicleMake).ToListAsync();
-            ViewData["MakeId"] = new SelectList(result.ConvertAll(s => s.SelectedVehicleMake), "Id", "Name");
+            var result = await (await _make.FindAsync("", "Id")).Results.ToListAsync();
+            ViewData["MakeId"] = new SelectList(result, "Id", "Name");
             return View();
         }
 
@@ -56,11 +64,11 @@ namespace Project.MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _service.CreateAsync(vehicleModel);
+                await _model.CreateAsync(vehicleModel);
                 return RedirectToAction(nameof(Index));
             }
-            var result = await (await _service.FindAsync("", "Id")).Results.ToListAsync();
-            ViewData["MakeId"] = new SelectList(result, "Id", "Abrv", vehicleModel.MakeId);
+            var result = await (await _make.FindAsync("", "Id")).Results.ToListAsync();
+            ViewData["MakeId"] = new SelectList(result, "Id", "Name");
             return View(vehicleModel);
         }
 
@@ -72,13 +80,13 @@ namespace Project.MVC.Controllers
                 return NotFound();
             }
 
-            var vehicleModel = await _service.GetAsync(id);
+            var vehicleModel = await _model.GetAsync(id);
             if (vehicleModel == null)
             {
                 return NotFound();
             }
-            var result = await (await _service.FindAsync("", "Id")).Results.ToListAsync();
-            ViewData["MakeId"] = new SelectList(result, "Id", "Abrv", vehicleModel.MakeId);
+            var result = await (await _make.FindAsync("", "Id")).Results.ToListAsync();
+            ViewData["MakeId"] = new SelectList(result, "Id", "Name");
             return View(vehicleModel);
         }
 
@@ -96,11 +104,11 @@ namespace Project.MVC.Controllers
 
             if (ModelState.IsValid)
             {
-                await _service.UpdateAsync(vehicleModel);
+                await _model.UpdateAsync(vehicleModel);
                 return RedirectToAction(nameof(Index));
             }
-            var result = await (await _service.FindAsync("", "Id")).Results.ToListAsync();
-            ViewData["MakeId"] = new SelectList(result, "Id", "Abrv", vehicleModel.MakeId);
+            var result = await (await _model.FindAsync("", "Id")).Results.ToListAsync();
+            ViewData["MakeId"] = new SelectList(result, "Id", "Name");
             return View(vehicleModel);
         }
 
@@ -112,9 +120,10 @@ namespace Project.MVC.Controllers
                 return NotFound();
             }
 
-            var vehicleModel = await (await _service.FindAsync("", "Id")).Results
+            var vehicleModel = await (await _model.FindAsync("", "Id")).Results
                 .Include(v => v.SelectedVehicleMake)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (vehicleModel == null)
             {
                 return NotFound();
@@ -128,7 +137,7 @@ namespace Project.MVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _service.DeleteAsync(id);
+            await _model.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
     }
