@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using Project.Service.DataAccess;
 using Project.Service.Models;
 
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Project.MVC.Controllers
@@ -18,9 +20,21 @@ namespace Project.MVC.Controllers
         }
 
         // GET: VehicleMakes
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index([FromQuery(Name = "sortBy")] string sortBy)
         {
-            return View(await (await _make.FindAsync("", "Id")).Results.ToListAsync());
+            ViewBag.NameSortParam = sortBy == "Name_desc" ? "Name" : "Name_desc";
+            ViewBag.AbrvSortParam = sortBy == "Abrv_desc" ? "Abrv" : "Abrv_desc";
+
+            switch (sortBy)
+            {
+                case "Abrv":
+                case "Abrv_desc":
+                    return View(await (await _make.FindAsync("", ViewBag.AbrvSortParam as string)).Results.ToListAsync());
+                case "Name":
+                case "Name_desc":
+                default:
+                    return View(await (await _make.FindAsync("", ViewBag.MakeSortParam as string)).Results.ToListAsync());
+            }
         }
 
         // GET: VehicleMakes/Details/5

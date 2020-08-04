@@ -33,6 +33,9 @@ namespace Project.Service.DataAccess
                 "Name" => query.OrderBy(s => s.Name),
                 "Id" => query.OrderBy(s => s.Id),
                 "Abrv" => query.OrderBy(s => s.Abrv),
+                "Id_desc" => query.OrderBy(s => s.Id),
+                "Name_desc" => query.OrderByDescending(s => s.Name),
+                "Abrv_desc" => query.OrderByDescending(s => s.Abrv),
                 _ => query.OrderBy(s => s.Name),
             };
         }

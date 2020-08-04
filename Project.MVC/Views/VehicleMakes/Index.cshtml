@@ -13,10 +13,10 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.ActionLink(Html.DisplayNameFor(model => model.Name), "Index", new { orderBy = ViewBag.MakeSortParam })
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Abrv)
+                @Html.ActionLink(Html.DisplayNameFor(model => model.Abrv), "Index", new { orderBy = ViewBag.AbrvSortParam })
             </th>
             <th></th>
         </tr>

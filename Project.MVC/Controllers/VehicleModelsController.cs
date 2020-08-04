@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 using Project.Service.DataAccess;
 using Project.Service.Models;
 
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Project.MVC.Controllers
@@ -21,10 +24,31 @@ namespace Project.MVC.Controllers
         }
 
         // GET: VehicleModels
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index([FromQuery(Name = "sortBy")] string sortBy)
         {
-            var result = (await _model.FindAsync("", "Id")).Results.Include(v => v.SelectedVehicleMake);
-            return View(await result.ToListAsync());
+            ViewBag.MakeSortParam = sortBy == "Make_desc" ? "Make" : "Make_desc";
+            ViewBag.NameSortParam = sortBy == "Name_desc" ? "Name" : "Name_desc";
+            ViewBag.AbrvSortParam = sortBy == "Abrv_desc" ? "Abrv" : "Abrv_desc";
+            List<VehicleModel> result;
+            switch (sortBy)
+            {
+                case "Name":
+                case "Name_desc":
+                    result = await (await _model.FindAsync("", ViewBag.NameSortParam as string)).Results.Include(v => v.SelectedVehicleMake).ToListAsync();
+                    break;
+                case "Abrv":
+                case "Abrv_desc":
+                    result = await (await _model.FindAsync("", ViewBag.AbrvSortParam as string)).Results.Include(v => v.SelectedVehicleMake).ToListAsync();
+                    break;
+                case "Make":
+                case "Make_desc":
+                default:
+                    result = await (await _model.FindAsync("", ViewBag.MakeSortParam as string)).Results.Include(v => v.SelectedVehicleMake).ToListAsync();
+                    result = (await Task.FromResult(ViewBag.MakeSortParam == "Make" ? result.OrderBy(m => m.SelectedVehicleMake.Name) : result.OrderByDescending(m => m.SelectedVehicleMake.Name))).ToList();
+                    break;
+            }
+
+            return View(result);
         }
 
         // GET: VehicleModels/Details/5
