@@ -22,7 +22,7 @@ namespace Project.MVC.Controllers
         // GET: VehicleMakes
         public async Task<IActionResult> Index()
         {
-            return View((await _service.FindAsync("", "Id")).Results);
+            return View(await (await _service.FindAsync("", "Id")).Results.ToListAsync());
         }
 
         // GET: VehicleMakes/Details/5
@@ -34,7 +34,6 @@ namespace Project.MVC.Controllers
             }
 
             var vehicleMake = await _service.GetAsync(id);
-
             if (vehicleMake == null)
             {
                 return NotFound();
@@ -123,7 +122,6 @@ namespace Project.MVC.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _service.DeleteAsync(id);
-
             return RedirectToAction(nameof(Index));
         }
     }

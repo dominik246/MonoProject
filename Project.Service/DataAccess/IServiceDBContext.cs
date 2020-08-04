@@ -14,7 +14,6 @@ namespace Project.Service.DataAccess
         DbSet<VehicleModel> VehicleModels { get; set; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default);
-        DbSet<TModel> Set<TModel>([NotNullAttribute] string name) where TModel : class;
         DbSet<TModel> Set<TModel>() where TModel : class;
     }
 }

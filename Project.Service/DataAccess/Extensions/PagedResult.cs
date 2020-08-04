@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Project.Service.DataAccess
 {
     public class PagedResult<T> where T : class
     {
-        public PagedResult()
-        {
-            Results = new List<T>();
-        }
-
-        public IList<T> Results { get; set; }
+        public IQueryable<T> Results { get; set; }
 
         public int CurrentPage { get; set; }
         public int PageCount { get; set; }

@@ -10,7 +10,7 @@ namespace Project.Service.DataAccess
 {
     public static class IQueryableExtensions
     {
-        public static async Task<PagedResult<T>> GetPagedAsync<T>(this IQueryable<T> query, int page, int pageSize) where T : class
+        public static PagedResult<T> GetPaged<T>(this IQueryable<T> query, int page, int pageSize) where T : class
         {
             var result = new PagedResult<T>
             {
@@ -24,7 +24,7 @@ namespace Project.Service.DataAccess
             result.PageCount = (int)Math.Ceiling(pageCount);
 
             var skip = (page - 1) * pageSize;
-            result.Results = await query.Skip(skip).Take(pageSize).ToListAsync();
+            result.Results = query.Skip(skip).Take(pageSize);
 
             return result;
         }

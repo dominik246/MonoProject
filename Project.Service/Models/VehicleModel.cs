@@ -9,7 +9,8 @@ namespace Project.Service.Models
         [Key]
         public int Id { get; set; }
 
-        public virtual VehicleMake SelectedVehicleMake { get; set; }
+        [Display(Name = "Vehicle Make")]
+        public VehicleMake SelectedVehicleMake { get; set; }
 
         [Display(Name = "Make Name")]
         [ForeignKey(nameof(SelectedVehicleMake))]
