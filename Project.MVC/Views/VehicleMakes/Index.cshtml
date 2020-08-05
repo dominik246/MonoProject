@@ -61,7 +61,7 @@
 
 <a asp-action="Index"
    asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNo="@(Model.CurrentPageIndex)"
+   asp-route-pageNo="@(Model.CurrentPageIndex - 1)"
    asp-route-currentFilter="@ViewData["CurrentFilter"]"
    class="btn btn-default @prevDisabled">
     Previous

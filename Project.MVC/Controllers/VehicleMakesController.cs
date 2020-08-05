@@ -21,7 +21,7 @@ namespace Project.MVC.Controllers
         }
 
         // GET: VehicleMakes
-        public async Task<IActionResult> Index([FromQuery(Name = "sortBy")] string sortBy, string currentFilter, string filter, int? page)
+        public async Task<IActionResult> Index([FromQuery(Name = "sortBy")] string sortBy, string currentFilter, string filter, [FromQuery(Name = "pageNo")] int? page)
         {
             int pageNumber = page ?? 1;
 

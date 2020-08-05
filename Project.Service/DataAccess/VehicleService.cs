@@ -17,21 +17,28 @@ namespace Project.Service.DataAccess
             _db = db;
         }
 
-        public async Task<PagedResult<TModel>> FindAsync(string searchString, string sortBy, int page, int pageLength)
+        public async Task<PagedResult<TModel>> FindAsync(string searchString, string sortBy, int page, int pageLength, bool paged)
         {
-            var result = await Task.FromResult(_db.Set<TModel>().GetSorted(sortBy).AsNoTracking().Include(_db));
+            var pagedResult = new PagedResult<TModel>();
+
+            pagedResult.Results = await Task.FromResult(_db.Set<TModel>().GetSorted(sortBy).AsNoTracking().Include(_db));
 
             if(!string.IsNullOrEmpty(searchString))
             {
-                result = result.GetFiltered(searchString);
+                pagedResult.Results = pagedResult.Results.GetFiltered(searchString);
             }
 
-            return result.GetPaged(page, pageLength);
+            if(paged)
+            {
+                pagedResult = pagedResult.Results.GetPaged(page, pageLength);
+            }
+
+            return pagedResult;
         }
 
         public async Task<TModel> GetAsync(int? id)
         {
-            return await _db.Set<TModel>().AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
+            return await _db.Set<TModel>().Include(_db).AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
         }
 
         public async Task CreateAsync(TModel entity)

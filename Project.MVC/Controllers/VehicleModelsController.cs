@@ -14,16 +14,16 @@ namespace Project.MVC.Controllers
     public class VehicleModelsController : Controller
     {
         private readonly IVehicleService<VehicleModel> _model;
-        //private readonly IVehicleService<VehicleMake> _make;
+        private readonly IVehicleService<VehicleMake> _make;
 
-        public VehicleModelsController(IVehicleService<VehicleModel> model/*, IVehicleService<VehicleMake> make*/)
+        public VehicleModelsController(IVehicleService<VehicleModel> model, IVehicleService<VehicleMake> make)
         {
             _model = model;
-            //_make = make;
+            _make = make;
         }
 
         // GET: VehicleModels
-        public async Task<IActionResult> Index([FromQuery(Name = "sortBy")] string sortBy, int? page, string currentFilter, string filter = "")
+        public async Task<IActionResult> Index([FromQuery(Name = "sortBy")] string sortBy, [FromQuery(Name = "pageNo")] int? page, string currentFilter, string filter = "")
         {
             int pageNumber = page ?? 1;
 
@@ -77,9 +77,7 @@ namespace Project.MVC.Controllers
                 return NotFound();
             }
 
-            var vehicleModel = await (await _model.FindAsync("", "Id")).Results
-                .Include(v => v.SelectedVehicleMake)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var vehicleModel = await _model.GetAsync(id);
 
             if (vehicleModel == null)
             {
@@ -92,9 +90,9 @@ namespace Project.MVC.Controllers
         // GET: VehicleModels/Create
         public async Task<IActionResult> Create()
         {
-            var result = await Task.FromResult((await _model.FindAsync("", "Id")).ListResults.ConvertAll(s => s.SelectedVehicleMake));
-            //var result = await (await _make.FindAsync("", "Id")).Results.ToListAsync();
-            ViewData["MakeId"] = new SelectList(result, "Id", "Name");
+            var result = await _make.FindAsync("", "Id", paged: false);
+            var list = result.ListResults;
+            ViewData["MakeId"] = new SelectList(list, "Id", "Name");
             return View();
         }
 
@@ -110,8 +108,9 @@ namespace Project.MVC.Controllers
                 await _model.CreateAsync(vehicleModel);
                 return RedirectToAction(nameof(Index));
             }
-            var result = await Task.FromResult((await _model.FindAsync("", "Id")).ListResults.ConvertAll(s => s.SelectedVehicleMake));
-            ViewData["MakeId"] = new SelectList(result, "Id", "Name");
+            var result = await _make.FindAsync("", "Id", paged: false);
+            var list = result.ListResults;
+            ViewData["MakeId"] = new SelectList(list, "Id", "Name");
             return View(vehicleModel);
         }
 
@@ -128,8 +127,9 @@ namespace Project.MVC.Controllers
             {
                 return NotFound();
             }
-            var result = await Task.FromResult((await _model.FindAsync("", "Id")).ListResults.ConvertAll(s => s.SelectedVehicleMake));
-            ViewData["MakeId"] = new SelectList(result, "Id", "Name");
+            var result = await _make.FindAsync("", "Id", paged: false);
+            var list = result.ListResults;
+            ViewData["MakeId"] = new SelectList(list, "Id", "Name");
             return View(vehicleModel);
         }
 
@@ -150,8 +150,9 @@ namespace Project.MVC.Controllers
                 await _model.UpdateAsync(vehicleModel);
                 return RedirectToAction(nameof(Index));
             }
-            var result = await (await _model.FindAsync("", "Id")).Results.ToListAsync();
-            ViewData["MakeId"] = new SelectList(result, "Id", "Name");
+            var result = await _make.FindAsync("", "Id", paged: false);
+            var list = result.ListResults;
+            ViewData["MakeId"] = new SelectList(list, "Id", "Name");
             return View(vehicleModel);
         }
 
@@ -163,9 +164,7 @@ namespace Project.MVC.Controllers
                 return NotFound();
             }
 
-            var vehicleModel = await (await _model.FindAsync("", "Id")).Results
-                .Include(v => v.SelectedVehicleMake)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var vehicleModel = await _model.GetAsync(id);
 
             if (vehicleModel == null)
             {
