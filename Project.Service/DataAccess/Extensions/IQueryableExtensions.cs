@@ -1,6 +1,11 @@
-﻿using Project.Service.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
+using Project.Service.Models;
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Project.Service.DataAccess
@@ -11,14 +16,14 @@ namespace Project.Service.DataAccess
         {
             var result = new PagedResult<T>
             {
-                CurrentPage = page,
-                PageSize = pageSize,
-                RowCount = query.Count()
+                CurrentPageIndex = page,
+                CurrentPageSize = pageSize,
+                CurrentRowCount = query.Count()
             };
 
 
-            var pageCount = (double)result.RowCount / pageSize;
-            result.PageCount = (int)Math.Ceiling(pageCount);
+            var pageCount = (double)result.CurrentRowCount / pageSize;
+            result.TotalPageCount = (int)Math.Ceiling(pageCount);
 
             var skip = (page - 1) * pageSize;
             result.Results = query.Skip(skip).Take(pageSize);
@@ -26,7 +31,7 @@ namespace Project.Service.DataAccess
             return result;
         }
 
-        public static IQueryable<T> GetSorted<T>(this IQueryable<T> query, string sortBy) where T : class, IModel
+        public static IQueryable<T> GetSorted<T>(this IQueryable<T> query, string sortBy) where T : class, Models.IModel
         {
             return sortBy switch
             {
@@ -40,11 +45,33 @@ namespace Project.Service.DataAccess
             };
         }
 
-        public static IQueryable<T> GetFiltered<T>(this IQueryable<T> query, string searchString) where T : class, IModel
+        public static IQueryable<T> GetFiltered<T>(this IQueryable<T> query, string searchString) where T : class, Models.IModel
         {
-            if (!string.IsNullOrEmpty(searchString))
+            if (typeof(T).IsAssignableFrom(typeof(VehicleModel)))
             {
-                query = query.Where(s => s.Abrv.Contains(searchString) || s.Name.Contains(searchString));
+                return query.Where(q => q.Abrv.Contains(searchString) || q.Name.Contains(searchString) || q.SelectedVehicleMake.Name.Contains(searchString));
+            }
+            else
+            {
+                return query.Where(q => q.Abrv.Contains(searchString) || q.Name.Contains(searchString));
+            }
+        }
+
+        public static IQueryable<T> Include<T>(this IQueryable<T> query, IServiceDBContext context) where T : class
+        {
+            List<string> includeList = new List<string>();
+
+            IEnumerable<INavigation> navigationProperties = context.Model.FindEntityType(typeof(T)).GetNavigations();
+            if (navigationProperties != null)
+            {
+                foreach (INavigation navigationProperty in navigationProperties)
+                {
+                    if (includeList.Contains(navigationProperty.Name))
+                        continue;
+
+                    includeList.Add(navigationProperty.Name);
+                    query = query.Include(navigationProperty.Name);
+                }
             }
             return query;
         }

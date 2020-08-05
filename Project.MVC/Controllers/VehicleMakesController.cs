@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Project.Service.DataAccess;
 using Project.Service.Models;
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,21 +21,43 @@ namespace Project.MVC.Controllers
         }
 
         // GET: VehicleMakes
-        public async Task<IActionResult> Index([FromQuery(Name = "sortBy")] string sortBy)
+        public async Task<IActionResult> Index([FromQuery(Name = "sortBy")] string sortBy, string currentFilter, string filter, int? page)
         {
+            int pageNumber = page ?? 1;
+
+            if (filter != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                filter = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = filter;
+
             ViewBag.NameSortParam = sortBy == "Name_desc" ? "Name" : "Name_desc";
             ViewBag.AbrvSortParam = sortBy == "Abrv_desc" ? "Abrv" : "Abrv_desc";
+
+            List<VehicleMake> list;
+            PagedResult<VehicleMake> pagedResult;
 
             switch (sortBy)
             {
                 case "Abrv":
                 case "Abrv_desc":
-                    return View(await (await _make.FindAsync("", ViewBag.AbrvSortParam as string)).Results.ToListAsync());
+                    pagedResult = await _make.FindAsync(filter, ViewBag.AbrvSortParam as string, pageNumber, 5);
+                    list = await pagedResult.Results.ToListAsync();
+                    break;
                 case "Name":
                 case "Name_desc":
                 default:
-                    return View(await (await _make.FindAsync("", ViewBag.MakeSortParam as string)).Results.ToListAsync());
+                    pagedResult = await _make.FindAsync(filter, ViewBag.MakeSortParam as string, pageNumber, 5);
+                    list = await pagedResult.Results.ToListAsync();
+                    break;
             }
+            pagedResult.ListResults = list;
+            return View(pagedResult);
         }
 
         // GET: VehicleMakes/Details/5

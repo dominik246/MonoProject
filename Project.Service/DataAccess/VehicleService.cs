@@ -1,13 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 using Project.Service.Models;
 
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 namespace Project.Service.DataAccess
 {
-    public class VehicleService<TModel> : IVehicleService<TModel> where TModel : class, IModel
+    public class VehicleService<TModel> : IVehicleService<TModel> where TModel : class, Models.IModel
     {
         private readonly IServiceDBContext _db;
+
         public VehicleService(IServiceDBContext db)
         {
             _db = db;
@@ -15,7 +19,14 @@ namespace Project.Service.DataAccess
 
         public async Task<PagedResult<TModel>> FindAsync(string searchString, string sortBy, int page, int pageLength)
         {
-            return await Task.FromResult(_db.Set<TModel>().GetFiltered(searchString).GetSorted(sortBy).AsNoTracking().GetPaged(page, pageLength));
+            var result = await Task.FromResult(_db.Set<TModel>().GetSorted(sortBy).AsNoTracking().Include(_db));
+
+            if(!string.IsNullOrEmpty(searchString))
+            {
+                result = result.GetFiltered(searchString);
+            }
+
+            return result.GetPaged(page, pageLength);
         }
 
         public async Task<TModel> GetAsync(int? id)

@@ -14,5 +14,6 @@ namespace Project.Service.DataAccess
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default);
         DbSet<TModel> Set<TModel>() where TModel : class;
+        Microsoft.EntityFrameworkCore.Metadata.IModel Model { get; }
     }
 }

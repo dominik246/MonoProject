@@ -8,7 +8,7 @@ namespace Project.Service.DataAccess
     {
         Task CreateAsync(TModel entity);
         Task DeleteAsync(int id);
-        Task<PagedResult<TModel>> FindAsync(string searchString, string sortBy, int page = 1, int pageLength = 10);
+        Task<PagedResult<TModel>> FindAsync(string searchString, string sortBy, int page = 1, int pageLength = 5);
         Task<TModel> GetAsync(int? id);
         Task UpdateAsync(TModel entity);
     }

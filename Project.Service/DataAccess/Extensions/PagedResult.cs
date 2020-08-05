@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Project.Service.DataAccess
@@ -7,20 +10,49 @@ namespace Project.Service.DataAccess
     {
         public IQueryable<T> Results { get; set; }
 
-        public int CurrentPage { get; set; }
-        public int PageCount { get; set; }
-        public int PageSize { get; set; }
-        public int RowCount { get; set; }
+        public int CurrentPageIndex { get; set; }
+        public int TotalPageCount { get; set; }
+        public int CurrentPageSize { get; set; }
+        public int CurrentRowCount { get; set; }
 
         public int FirstRowOnPage
         {
 
-            get { return ((CurrentPage - 1) * PageSize) + 1; }
+            get { return ((CurrentPageIndex - 1) * CurrentPageSize) + 1; }
         }
 
         public int LastRowOnPage
         {
-            get { return Math.Min(CurrentPage * PageSize, RowCount); }
+            get { return Math.Min(CurrentPageIndex * CurrentPageSize, CurrentRowCount); }
+        }
+
+        public bool HasPreviousPage
+        {
+            get
+            {
+                return CurrentPageIndex > 1;
+            }
+        }
+
+        public bool HasNextPage
+        {
+            get
+            {
+                return CurrentPageIndex < TotalPageCount;
+            }
+        }
+
+        private List<T> _listResults;
+        public List<T> ListResults
+        {
+            get
+            {
+                return _listResults ??= Results.ToList();
+            }
+            set
+            {
+                _listResults = value;
+            }
         }
     }
 }
