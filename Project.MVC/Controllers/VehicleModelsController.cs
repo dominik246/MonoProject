@@ -15,6 +15,7 @@ namespace Project.MVC.Controllers
     {
         private readonly IVehicleService<VehicleModel> _model;
         private readonly IVehicleService<VehicleMake> _make;
+        private const int pageSize = 10;
 
         public VehicleModelsController(IVehicleService<VehicleModel> model, IVehicleService<VehicleMake> make)
         {
@@ -41,26 +42,28 @@ namespace Project.MVC.Controllers
             ViewBag.MakeSortParam = sortBy == "Make_desc" ? "Make" : "Make_desc";
             ViewBag.NameSortParam = sortBy == "Name_desc" ? "Name" : "Name_desc";
             ViewBag.AbrvSortParam = sortBy == "Abrv_desc" ? "Abrv" : "Abrv_desc";
-            
+
             List<VehicleModel> list;
             PagedResult<VehicleModel> pagedResult;
+
+
 
             switch (sortBy)
             {
                 case "Name":
                 case "Name_desc":
-                    pagedResult = await _model.FindAsync(filter, ViewBag.NameSortParam as string, pageNumber, 5);
+                    pagedResult = await _model.FindAsync(filter, ViewBag.NameSortParam as string, pageNumber, pageSize);
                     list = await pagedResult.Results.ToListAsync();
                     break;
                 case "Abrv":
                 case "Abrv_desc":
-                    pagedResult = await _model.FindAsync(filter, ViewBag.AbrvSortParam as string, pageNumber, 5);
+                    pagedResult = await _model.FindAsync(filter, ViewBag.AbrvSortParam as string, pageNumber, pageSize);
                     list = await pagedResult.Results.ToListAsync();
                     break;
                 case "Make":
                 case "Make_desc":
                 default:
-                    pagedResult = await _model.FindAsync(filter, ViewBag.MakeSortParam as string, pageNumber, 5);
+                    pagedResult = await _model.FindAsync(filter, ViewBag.MakeSortParam as string, pageNumber, pageSize);
                     list = await pagedResult.Results.ToListAsync();
                     list = await Task.FromResult((await Task.FromResult(ViewBag.MakeSortParam == "Make" ? list.OrderBy(m => m.SelectedVehicleMake.Name) : list.OrderByDescending(m => m.SelectedVehicleMake.Name))).ToList());
                     break;

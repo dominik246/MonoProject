@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using Project.Service.DataAccess;
 using Project.Service.Models;
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Project.MVC.Controllers
@@ -14,6 +12,7 @@ namespace Project.MVC.Controllers
     public class VehicleMakesController : Controller
     {
         private readonly IVehicleService<VehicleMake> _make;
+        private const int pageSize = 5;
 
         public VehicleMakesController(IVehicleService<VehicleMake> make)
         {
@@ -46,13 +45,13 @@ namespace Project.MVC.Controllers
             {
                 case "Abrv":
                 case "Abrv_desc":
-                    pagedResult = await _make.FindAsync(filter, ViewBag.AbrvSortParam as string, pageNumber, 5);
+                    pagedResult = await _make.FindAsync(filter, ViewBag.AbrvSortParam as string, pageNumber, pageSize);
                     list = await pagedResult.Results.ToListAsync();
                     break;
                 case "Name":
                 case "Name_desc":
                 default:
-                    pagedResult = await _make.FindAsync(filter, ViewBag.MakeSortParam as string, pageNumber, 5);
+                    pagedResult = await _make.FindAsync(filter, ViewBag.MakeSortParam as string, pageNumber, pageSize);
                     list = await pagedResult.Results.ToListAsync();
                     break;
             }

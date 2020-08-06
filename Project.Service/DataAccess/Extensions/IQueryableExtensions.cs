@@ -2,8 +2,6 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
-using Project.Service.Models;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +21,7 @@ namespace Project.Service.DataAccess
 
 
             var pageCount = (double)result.CurrentRowCount / pageSize;
-            result.TotalPageCount = (int)Math.Ceiling(pageCount);
+            result.TotalPageCount = pageCount == 0 ? 1 : (int)Math.Ceiling(pageCount);
 
             var skip = (page - 1) * pageSize;
             result.Results = query.Skip(skip).Take(pageSize);
@@ -47,7 +45,7 @@ namespace Project.Service.DataAccess
 
         public static IQueryable<T> GetFiltered<T>(this IQueryable<T> query, string searchString) where T : class, Models.IModel
         {
-            if (typeof(T).IsAssignableFrom(typeof(VehicleModel)))
+            if (typeof(T).GetProperty("SelectedVehicleMake") != null)
             {
                 return query.Where(q => q.Abrv.Contains(searchString) || q.Name.Contains(searchString) || q.SelectedVehicleMake.Name.Contains(searchString));
             }
@@ -55,9 +53,13 @@ namespace Project.Service.DataAccess
             {
                 return query.Where(q => q.Abrv.Contains(searchString) || q.Name.Contains(searchString));
             }
+
         }
 
-        public static IQueryable<T> Include<T>(this IQueryable<T> query, IServiceDBContext context) where T : class
+        /// <summary>
+        /// Includes all Navigation Properties from the given type.
+        /// </summary>
+        public static IQueryable<T> IncludeAll<T>(this IQueryable<T> query, IServiceDBContext context) where T : class
         {
             List<string> includeList = new List<string>();
 

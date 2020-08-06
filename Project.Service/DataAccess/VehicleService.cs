@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 
-using Project.Service.Models;
-
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 namespace Project.Service.DataAccess
 {
@@ -21,14 +16,14 @@ namespace Project.Service.DataAccess
         {
             var pagedResult = new PagedResult<TModel>();
 
-            pagedResult.Results = await Task.FromResult(_db.Set<TModel>().GetSorted(sortBy).AsNoTracking().Include(_db));
+            pagedResult.Results = await Task.FromResult(_db.Set<TModel>().IncludeAll(_db).GetSorted(sortBy).AsNoTracking());
 
-            if(!string.IsNullOrEmpty(searchString))
+            if (!string.IsNullOrEmpty(searchString))
             {
                 pagedResult.Results = pagedResult.Results.GetFiltered(searchString);
             }
 
-            if(paged)
+            if (paged)
             {
                 pagedResult = pagedResult.Results.GetPaged(page, pageLength);
             }
@@ -38,7 +33,7 @@ namespace Project.Service.DataAccess
 
         public async Task<TModel> GetAsync(int? id)
         {
-            return await _db.Set<TModel>().Include(_db).AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
+            return await _db.Set<TModel>().IncludeAll(_db).AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
         }
 
         public async Task CreateAsync(TModel entity)
