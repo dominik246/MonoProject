@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Project.Service.Models
 {
-    public class VehicleModel : IModel
+    public class VehicleModel : IVehicle
     {
         [Display(Name = "ID")]
         [Key]

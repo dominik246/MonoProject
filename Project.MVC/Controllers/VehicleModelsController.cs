@@ -30,7 +30,7 @@ namespace Project.MVC.Controllers
 
             if (filter != null)
             {
-                page = 1;
+                pageNumber = 1;
             }
             else
             {

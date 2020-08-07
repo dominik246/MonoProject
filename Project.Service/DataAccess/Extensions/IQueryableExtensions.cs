@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
+using Project.Service.Models;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +31,7 @@ namespace Project.Service.DataAccess
             return result;
         }
 
-        public static IQueryable<T> GetSorted<T>(this IQueryable<T> query, string sortBy) where T : class, Models.IModel
+        public static IQueryable<T> GetSorted<T>(this IQueryable<T> query, string sortBy) where T : class, IVehicle
         {
             return sortBy switch
             {
@@ -43,7 +45,7 @@ namespace Project.Service.DataAccess
             };
         }
 
-        public static IQueryable<T> GetFiltered<T>(this IQueryable<T> query, string searchString) where T : class, Models.IModel
+        public static IQueryable<T> GetFiltered<T>(this IQueryable<T> query, string searchString) where T : class,  IVehicle
         {
             if (typeof(T).GetProperty("SelectedVehicleMake") != null)
             {

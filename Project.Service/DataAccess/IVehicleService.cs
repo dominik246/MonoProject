@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Project.Service.DataAccess
 {
-    public interface IVehicleService<TModel> where TModel : class, IModel
+    public interface IVehicleService<TModel> where TModel : class, IVehicle
     {
         Task CreateAsync(TModel entity);
         Task DeleteAsync(int id);

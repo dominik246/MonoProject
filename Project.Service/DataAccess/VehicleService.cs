@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
+using Project.Service.Models;
+
 using System.Threading.Tasks;
 namespace Project.Service.DataAccess
 {
-    public class VehicleService<TModel> : IVehicleService<TModel> where TModel : class, Models.IModel
+    public class VehicleService<TModel> : IVehicleService<TModel> where TModel : class, IVehicle
     {
         private readonly IServiceDBContext _db;
 

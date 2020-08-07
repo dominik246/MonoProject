@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Project.Service.Models
 {
-    public class VehicleMake : IModel
+    public class VehicleMake : IVehicle
     {
         [Display(Name = "ID")]
         [Key]
@@ -25,6 +25,6 @@ namespace Project.Service.Models
         public virtual ICollection<VehicleModel> VehicleModelCollection { get; set; }
 
         [NotMapped]
-        VehicleMake IModel.SelectedVehicleMake { get; set; }
+        VehicleMake IVehicle.SelectedVehicleMake { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Project.Service.Models
 {
-    public interface IModel
+    public interface IVehicle
     {
         int Id { get; set; }
         string Name { get; set; }
