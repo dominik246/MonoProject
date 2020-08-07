@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -41,8 +40,8 @@ namespace Project.Service.DataAccess
             }
         }
 
-        private List<T> _listResults;
-        public List<T> ListResults
+        private IEnumerable<T> _listResults;
+        public IEnumerable<T> ListResults
         {
             get
             {

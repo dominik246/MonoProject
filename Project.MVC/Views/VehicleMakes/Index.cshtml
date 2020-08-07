@@ -22,10 +22,10 @@
     <thead>
         <tr>
             <th>
-                @Html.ActionLink("Make name", "Index", new { orderBy = ViewBag.MakeSortParam, currentFilter = ViewBag.CurrentFilter })
+                @Html.ActionLink("Make name", "Index", new { sortBy = ViewBag.NameSortParam, currentFilter = ViewBag.CurrentFilter })
             </th>
             <th>
-                @Html.ActionLink("Abbreviation", "Index", new { orderBy = ViewBag.AbrvSortParam, currentFilter = ViewBag.CurrentFilter })
+                @Html.ActionLink("Abbreviation", "Index", new { sortBy = ViewBag.AbrvSortParam, currentFilter = ViewBag.CurrentFilter })
             </th>
             <th></th>
         </tr>

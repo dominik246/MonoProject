@@ -35,8 +35,8 @@ namespace Project.MVC.Controllers
 
             ViewBag.CurrentFilter = filter;
 
-            ViewBag.NameSortParam = sortBy == "Name_desc" ? "Name" : "Name_desc";
-            ViewBag.AbrvSortParam = sortBy == "Abrv_desc" ? "Abrv" : "Abrv_desc";
+            ViewBag.NameSortParam = sortBy == "Name" ? "Name_desc" : "Name";
+            ViewBag.AbrvSortParam = sortBy == "Abrv" ? "Abrv_desc" : "Abrv";
 
             List<VehicleMake> list;
             PagedResult<VehicleMake> pagedResult;
@@ -51,7 +51,7 @@ namespace Project.MVC.Controllers
                 case "Name":
                 case "Name_desc":
                 default:
-                    pagedResult = await _make.FindAsync(filter, ViewBag.MakeSortParam as string, pageNumber, pageSize);
+                    pagedResult = await _make.FindAsync(filter, ViewBag.NameSortParam as string, pageNumber, pageSize);
                     list = await pagedResult.Results.ToListAsync();
                     break;
             }

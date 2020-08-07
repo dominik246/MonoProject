@@ -39,9 +39,9 @@ namespace Project.MVC.Controllers
 
             ViewBag.CurrentFilter = filter;
 
-            ViewBag.MakeSortParam = sortBy == "Make_desc" ? "Make" : "Make_desc";
-            ViewBag.NameSortParam = sortBy == "Name_desc" ? "Name" : "Name_desc";
-            ViewBag.AbrvSortParam = sortBy == "Abrv_desc" ? "Abrv" : "Abrv_desc";
+            ViewBag.MakeSortParam = sortBy == "Make" ? "Make_desc" : "Make";
+            ViewBag.NameSortParam = sortBy == "Name" ? "Name_desc" : "Name";
+            ViewBag.AbrvSortParam = sortBy == "Abrv" ? "Abrv_desc" : "Abrv";
 
             List<VehicleModel> list;
             PagedResult<VehicleModel> pagedResult;
