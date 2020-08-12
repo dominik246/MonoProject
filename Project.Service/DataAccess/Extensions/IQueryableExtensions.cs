@@ -45,9 +45,10 @@ namespace Project.Service.DataAccess
                 return query;
             if (typeof(T).IsAssignableFrom(typeof(VehicleModel)))
             {
-                return query.Where(q => (q as VehicleModel).Abrv.Contains(filter.FilterString) ||
-                (q as VehicleModel).Name.Contains(filter.FilterString) ||
-                (q as VehicleModel).SelectedVehicleMake.Name.Contains(filter.FilterString));
+                var concreteQueryable = query.Cast<VehicleModel>().Where(q => q.Abrv.Contains(filter.FilterString) ||
+                q.Name.Contains(filter.FilterString) ||
+                q.SelectedVehicleMake.Name.Contains(filter.FilterString));
+                return concreteQueryable.Cast<T>();
             }
             else
             {
