@@ -57,7 +57,7 @@ namespace Project.MVC.Controllers
 
             _page.CurrentPageIndex = pageNumber;
             _sort.SortBy = sortBy;
-
+            _filter.FilterString = filter;
 
             PageModel<VehicleMake> result = await _make.FindAsync(_filter, _page, _sort);
             return View(result);

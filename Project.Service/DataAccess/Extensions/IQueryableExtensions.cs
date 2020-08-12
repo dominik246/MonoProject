@@ -41,17 +41,14 @@ namespace Project.Service.DataAccess
             };
         }
 
-        public static IQueryable<T> GetFiltered<T>(this IQueryable<T> query, FilterModel filter) where T : class,  IVehicle
+        public static IQueryable<T> GetFiltered<T>(this IQueryable<T> query, FilterModel filter) where T : class, IVehicle
         {
             if (string.IsNullOrEmpty(filter?.FilterString))
                 return query;
 
             if (typeof(T).GetProperty("SelectedVehicleMake") != null)
             {
-                //q => q.Abrv.Contains(filter.FilterString) || 
-                //q.Name.Contains(filter.FilterString) || 
-                //q.SelectedVehicleMake.Name.Contains(filter.FilterString)
-                return query.Where("CONTAINS(Abrv, '{0}') OR CONTAINS(Name, '{0}') OR CONTAINS(SelectedVehicleMake.Name, '{0}')", filter.FilterString);
+                return query.Where("Name.CONTAINS(@0) || Abrv.CONTAINS(@0) || SelectedVehicleMake.Name.Contains(@0)", filter.FilterString);
             }
             else
             {

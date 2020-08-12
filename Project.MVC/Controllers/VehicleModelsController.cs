@@ -56,6 +56,7 @@ namespace Project.MVC.Controllers
 
             _pageModel.CurrentPageIndex = pageNumber;
             _sort.SortBy = sortBy;
+            _filter.FilterString = filter;
 
             ViewBag.CurrentFilter = filter;
 
