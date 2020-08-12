@@ -36,12 +36,6 @@ namespace Project.MVC
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddDbContext<IServiceDBContext, ServiceDBContext>(options =>
-            //{
-            //    options.UseSqlServer(Configuration.GetConnectionString("default"));
-            //});
-            //services.AddScoped(typeof(IVehicleService<>), typeof(VehicleService<>));
-            //services.AddControllersWithViews();
             services.AddOptions();
             services.AddMvc().AddControllersAsServices();
         }
@@ -50,10 +44,6 @@ namespace Project.MVC
         {
             var dbContextOptionsBuilder = new DbContextOptionsBuilder().UseSqlServer(Configuration.GetConnectionString("default"));
 
-            builder
-                .RegisterGeneric(typeof(VehicleService<>))
-                .As(typeof(IVehicleService<>))
-                .InstancePerLifetimeScope();
             builder
                 .RegisterGeneric(typeof(VehicleService<>))
                 .As(typeof(IVehicleService<>))
