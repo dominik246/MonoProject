@@ -19,7 +19,7 @@ namespace Project.Service.DataAccess
         {
             page ??= new PageModel<TModel>() { ReturnPaged = false };
             page.QueryResult = await Task.FromResult(_db.Set<TModel>().IncludeAll(_db)
-                .GetSorted(sort).GetFiltered(filter));
+                .GetSorted(sort).GetFiltered(filter).AsNoTracking());
 
             if(page.ReturnPaged)
             {
