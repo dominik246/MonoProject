@@ -12,11 +12,16 @@ namespace Project.MVC.Controllers
     public class VehicleMakesController : Controller
     {
         private readonly IVehicleService<VehicleMake> _make;
-        private const int pageSize = 5;
+        private readonly PageModel<VehicleMake> _page;
+        private readonly FilterModel _filter;
+        private readonly SortModel _sort;
 
-        public VehicleMakesController(IVehicleService<VehicleMake> make)
+        public VehicleMakesController(IVehicleService<VehicleMake> make, PageModel<VehicleMake> page, FilterModel filter, SortModel sort)
         {
             _make = make;
+            _page = page;
+            _filter = filter;
+            _sort = sort;
         }
 
         // GET: VehicleMakes
@@ -33,30 +38,29 @@ namespace Project.MVC.Controllers
                 filter = currentFilter;
             }
 
+            if(!string.IsNullOrEmpty(sortBy))
+            {
+                if (sortBy.Contains("_desc"))
+                {
+                    sortBy = sortBy.Replace("_desc", "");
+                }
+                else
+                {
+                    sortBy += "_desc";
+                }
+            }
+
             ViewBag.CurrentFilter = filter;
 
             ViewBag.NameSortParam = sortBy == "Name" ? "Name_desc" : "Name";
             ViewBag.AbrvSortParam = sortBy == "Abrv" ? "Abrv_desc" : "Abrv";
 
-            List<VehicleMake> list;
-            PagedResult<VehicleMake> pagedResult;
+            _page.CurrentPageIndex = pageNumber;
+            _sort.SortBy = sortBy;
 
-            switch (sortBy)
-            {
-                case "Abrv":
-                case "Abrv_desc":
-                    pagedResult = await _make.FindAsync(filter, ViewBag.AbrvSortParam as string, pageNumber, pageSize);
-                    list = await pagedResult.Results.ToListAsync();
-                    break;
-                case "Name":
-                case "Name_desc":
-                default:
-                    pagedResult = await _make.FindAsync(filter, ViewBag.NameSortParam as string, pageNumber, pageSize);
-                    list = await pagedResult.Results.ToListAsync();
-                    break;
-            }
-            pagedResult.ListResults = list;
-            return View(pagedResult);
+
+            PageModel<VehicleMake> result = await _make.FindAsync(_filter, _page, _sort);
+            return View(result);
         }
 
         // GET: VehicleMakes/Details/5

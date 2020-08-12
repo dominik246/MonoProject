@@ -1,39 +1,35 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Storage;
 
 using Project.Service.Models;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 
 namespace Project.Service.DataAccess
 {
     public static class IQueryableExtensions
     {
-        public static PagedResult<T> GetPaged<T>(this IQueryable<T> query, int page, int pageSize) where T : class
+        public static PageModel<T> GetPaged<T>(this IQueryable<T> query, PageModel<T> page)
         {
-            var result = new PagedResult<T>
-            {
-                CurrentPageIndex = page,
-                CurrentPageSize = pageSize,
-                CurrentRowCount = query.Count()
-            };
+            var pageCount = (double)page.CurrentRowCount / page.CurrentPageSize;
+            page.TotalPageCount = pageCount == 0 ? 1 : (int)Math.Ceiling(pageCount);
 
-
-            var pageCount = (double)result.CurrentRowCount / pageSize;
-            result.TotalPageCount = pageCount == 0 ? 1 : (int)Math.Ceiling(pageCount);
-
-            var skip = (page - 1) * pageSize;
-            result.Results = query.Skip(skip).Take(pageSize);
-
-            return result;
+            var skip = (page.CurrentPageIndex - 1) * page.CurrentPageSize;
+            page.QueryResult = query.Skip(skip).Take(page.CurrentPageSize);
+            return page;
         }
 
-        public static IQueryable<T> GetSorted<T>(this IQueryable<T> query, string sortBy) where T : class, IVehicle
+        public static IQueryable<T> GetSorted<T>(this IQueryable<T> query, SortModel sort) where T : class, IVehicle
         {
-            return sortBy switch
+            if (sort == null)
+                return query;
+
+            return sort.SortBy switch
             {
                 "Name" => query.OrderBy(s => s.Name),
                 "Id" => query.OrderBy(s => s.Id),
@@ -45,15 +41,21 @@ namespace Project.Service.DataAccess
             };
         }
 
-        public static IQueryable<T> GetFiltered<T>(this IQueryable<T> query, string searchString) where T : class,  IVehicle
+        public static IQueryable<T> GetFiltered<T>(this IQueryable<T> query, FilterModel filter) where T : class,  IVehicle
         {
+            if (string.IsNullOrEmpty(filter?.FilterString))
+                return query;
+
             if (typeof(T).GetProperty("SelectedVehicleMake") != null)
             {
-                return query.Where(q => q.Abrv.Contains(searchString) || q.Name.Contains(searchString) || q.SelectedVehicleMake.Name.Contains(searchString));
+                //q => q.Abrv.Contains(filter.FilterString) || 
+                //q.Name.Contains(filter.FilterString) || 
+                //q.SelectedVehicleMake.Name.Contains(filter.FilterString)
+                return query.Where("CONTAINS(Abrv, '{0}') OR CONTAINS(Name, '{0}') OR CONTAINS(SelectedVehicleMake.Name, '{0}')", filter.FilterString);
             }
             else
             {
-                return query.Where(q => q.Abrv.Contains(searchString) || q.Name.Contains(searchString));
+                return query.Where(q => q.Abrv.Contains(filter.FilterString) || q.Name.Contains(filter.FilterString));
             }
 
         }

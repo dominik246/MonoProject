@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 
 using Project.MVC.Controllers;
 using Project.Service.DataAccess;
+using Project.Service.Models;
 
 using System;
 using System.Linq;
@@ -52,6 +53,18 @@ namespace Project.MVC
                 .RegisterType<ServiceDBContext>()
                 .As<IServiceDBContext>()
                 .WithParameter("options", dbContextOptionsBuilder.Options)
+                .InstancePerLifetimeScope();
+            builder
+                .RegisterType<SortModel>()
+                .AsSelf()
+                .InstancePerLifetimeScope();
+            builder
+                .RegisterGeneric(typeof(PageModel<>))
+                .AsSelf()
+                .InstancePerLifetimeScope();
+            builder
+                .RegisterType<FilterModel>()
+                .AsSelf()
                 .InstancePerLifetimeScope();
         }
 

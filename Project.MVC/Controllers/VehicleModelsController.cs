@@ -15,12 +15,17 @@ namespace Project.MVC.Controllers
     {
         private readonly IVehicleService<VehicleModel> _model;
         private readonly IVehicleService<VehicleMake> _make;
-        private const int pageSize = 10;
+        private readonly PageModel<VehicleModel> _pageModel;
+        private readonly FilterModel _filter;
+        private readonly SortModel _sort;
 
-        public VehicleModelsController(IVehicleService<VehicleModel> model, IVehicleService<VehicleMake> make)
+        public VehicleModelsController(IVehicleService<VehicleModel> model, IVehicleService<VehicleMake> make, PageModel<VehicleModel> page, FilterModel filter, SortModel sort)
         {
             _model = model;
             _make = make;
+            _pageModel = page;
+            _filter = filter;
+            _sort = sort;
         }
 
         // GET: VehicleModels
@@ -37,39 +42,29 @@ namespace Project.MVC.Controllers
                 filter = currentFilter;
             }
 
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                if (sortBy.Contains("_desc"))
+                {
+                    sortBy = sortBy.Replace("_desc", "");
+                }
+                else
+                {
+                    sortBy += "_desc";
+                }
+            }
+
+            _pageModel.CurrentPageIndex = pageNumber;
+            _sort.SortBy = sortBy;
+
             ViewBag.CurrentFilter = filter;
 
             ViewBag.MakeSortParam = sortBy == "Make" ? "Make_desc" : "Make";
             ViewBag.NameSortParam = sortBy == "Name" ? "Name_desc" : "Name";
             ViewBag.AbrvSortParam = sortBy == "Abrv" ? "Abrv_desc" : "Abrv";
 
-            List<VehicleModel> list;
-            PagedResult<VehicleModel> pagedResult;
-
-
-
-            switch (sortBy)
-            {
-                case "Name":
-                case "Name_desc":
-                    pagedResult = await _model.FindAsync(filter, ViewBag.NameSortParam as string, pageNumber, pageSize);
-                    list = await pagedResult.Results.ToListAsync();
-                    break;
-                case "Abrv":
-                case "Abrv_desc":
-                    pagedResult = await _model.FindAsync(filter, ViewBag.AbrvSortParam as string, pageNumber, pageSize);
-                    list = await pagedResult.Results.ToListAsync();
-                    break;
-                case "Make":
-                case "Make_desc":
-                default:
-                    pagedResult = await _model.FindAsync(filter, ViewBag.MakeSortParam as string, pageNumber, pageSize);
-                    list = await pagedResult.Results.ToListAsync();
-                    list = await Task.FromResult((await Task.FromResult(ViewBag.MakeSortParam == "Make" ? list.OrderBy(m => m.SelectedVehicleMake.Name) : list.OrderByDescending(m => m.SelectedVehicleMake.Name))).ToList());
-                    break;
-            }
-            pagedResult.ListResults = list;
-            return View(pagedResult);
+            PageModel<VehicleModel> result = await _model.FindAsync(_filter, _pageModel, _sort);
+            return View(result);
         }
 
         // GET: VehicleModels/Details/5
@@ -93,8 +88,8 @@ namespace Project.MVC.Controllers
         // GET: VehicleModels/Create
         public async Task<IActionResult> Create()
         {
-            var result = await _make.FindAsync("", "Id", paged: false);
-            var list = result.ListResults;
+            var result = await _make.FindAsync(_filter, null, _sort);
+            var list = result.ListResult;
             ViewData["MakeId"] = new SelectList(list, "Id", "Name");
             return View();
         }
@@ -111,8 +106,8 @@ namespace Project.MVC.Controllers
                 await _model.CreateAsync(vehicleModel);
                 return RedirectToAction(nameof(Index));
             }
-            var result = await _make.FindAsync("", "Id", paged: false);
-            var list = result.ListResults;
+            var result = await _make.FindAsync(_filter, null, _sort);
+            var list = result.ListResult;
             ViewData["MakeId"] = new SelectList(list, "Id", "Name");
             return View(vehicleModel);
         }
@@ -130,8 +125,8 @@ namespace Project.MVC.Controllers
             {
                 return NotFound();
             }
-            var result = await _make.FindAsync("", "Id", paged: false);
-            var list = result.ListResults;
+            var result = await _make.FindAsync(_filter, null, _sort);
+            var list = result.ListResult;
             ViewData["MakeId"] = new SelectList(list, "Id", "Name");
             return View(vehicleModel);
         }
@@ -153,8 +148,8 @@ namespace Project.MVC.Controllers
                 await _model.UpdateAsync(vehicleModel);
                 return RedirectToAction(nameof(Index));
             }
-            var result = await _make.FindAsync("", "Id", paged: false);
-            var list = result.ListResults;
+            var result = await _make.FindAsync(_filter, null, _sort);
+            var list = result.ListResult;
             ViewData["MakeId"] = new SelectList(list, "Id", "Name");
             return View(vehicleModel);
         }

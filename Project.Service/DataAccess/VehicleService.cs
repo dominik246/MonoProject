@@ -2,6 +2,7 @@
 
 using Project.Service.Models;
 
+using System.Linq;
 using System.Threading.Tasks;
 namespace Project.Service.DataAccess
 {
@@ -14,23 +15,20 @@ namespace Project.Service.DataAccess
             _db = db;
         }
 
-        public async Task<PagedResult<TModel>> FindAsync(string searchString, string sortBy, int page, int pageLength, bool paged)
+        public async Task<PageModel<TModel>> FindAsync(FilterModel filter, PageModel<TModel> page, SortModel sort)
         {
-            var pagedResult = new PagedResult<TModel>();
+            page ??= new PageModel<TModel>() { ReturnPaged = false };
+            page.QueryResult = await Task.FromResult(_db.Set<TModel>().IncludeAll(_db)
+                .GetSorted(sort).GetFiltered(filter));
 
-            pagedResult.Results = await Task.FromResult(_db.Set<TModel>().IncludeAll(_db).GetSorted(sortBy).AsNoTracking());
-
-            if (!string.IsNullOrEmpty(searchString))
+            if(page.ReturnPaged)
             {
-                pagedResult.Results = pagedResult.Results.GetFiltered(searchString);
+                page.CurrentRowCount = page.QueryResult.Count();
+                page.QueryResult = page.QueryResult.GetPaged(page).QueryResult;
+                page.TotalPageCount = page.TotalPageCount;
             }
 
-            if (paged)
-            {
-                pagedResult = pagedResult.Results.GetPaged(page, pageLength);
-            }
-
-            return pagedResult;
+            return page;
         }
 
         public async Task<TModel> GetAsync(int? id)

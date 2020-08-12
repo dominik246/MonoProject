@@ -1,16 +1,18 @@
-﻿using System;
+﻿using Project.Service.DataAccess;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Project.Service.DataAccess
+namespace Project.Service.Models
 {
-    public class PagedResult<T> where T : class
+    public class PageModel<T>
     {
-        public IQueryable<T> Results { get; set; }
+        public IQueryable<T> QueryResult { get; set; }
 
         public int CurrentPageIndex { get; set; }
         public int TotalPageCount { get; set; }
-        public int CurrentPageSize { get; set; }
+        public int CurrentPageSize { get; set; } = 5;
         public int CurrentRowCount { get; set; }
 
         public int FirstRowOnPage
@@ -40,16 +42,13 @@ namespace Project.Service.DataAccess
             }
         }
 
-        private IEnumerable<T> _listResults;
-        public IEnumerable<T> ListResults
+        public bool ReturnPaged { get; set; } = true;
+
+        public IEnumerable<T> ListResult
         {
             get
             {
-                return _listResults ??= Results.ToList();
-            }
-            set
-            {
-                _listResults = value;
+                return QueryResult.ToList();
             }
         }
     }
