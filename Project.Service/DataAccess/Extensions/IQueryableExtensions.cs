@@ -1,14 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore.Storage;
 
 using Project.Service.Models;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 
 namespace Project.Service.DataAccess
 {
@@ -45,10 +43,11 @@ namespace Project.Service.DataAccess
         {
             if (string.IsNullOrEmpty(filter?.FilterString))
                 return query;
-
-            if (typeof(T).GetProperty("SelectedVehicleMake") != null)
+            if (typeof(T).IsAssignableFrom(typeof(VehicleModel)))
             {
-                return query.Where("Name.CONTAINS(@0) || Abrv.CONTAINS(@0) || SelectedVehicleMake.Name.Contains(@0)", filter.FilterString);
+                return query.Where(q => (q as VehicleModel).Abrv.Contains(filter.FilterString) ||
+                (q as VehicleModel).Name.Contains(filter.FilterString) ||
+                (q as VehicleModel).SelectedVehicleMake.Name.Contains(filter.FilterString));
             }
             else
             {
