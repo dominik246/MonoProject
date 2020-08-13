@@ -28,7 +28,7 @@ namespace Project.MVC.Controllers
         }
 
         // GET: VehicleMakes
-        public async Task<IActionResult> Index([FromQuery(Name = "sortBy")] string sortBy, string currentFilter, string filter, [FromQuery(Name = "pageNo")] int? page)
+        public async Task<IActionResult> Index(string filter, [FromQuery(Name = "pageNo")] int? page, string sortBy)
         {
             int pageNumber = page ?? 1;
 
@@ -36,36 +36,15 @@ namespace Project.MVC.Controllers
             {
                 pageNumber = 1;
             }
-            else
-            {
-                filter = currentFilter;
-            }
 
-            if (!string.IsNullOrEmpty(sortBy))
-            {
-                if (sortBy.Contains("_desc"))
-                {
-                    sortBy = sortBy.Replace("_desc", "");
-                }
-                else
-                {
-                    sortBy += "_desc";
-                }
-            }
-
-            ViewBag.CurrentFilter = filter;
-
-            ViewBag.NameSortParam = sortBy == "Name" ? "Name_desc" : "Name";
-            ViewBag.AbrvSortParam = sortBy == "Abrv" ? "Abrv_desc" : "Abrv";
+            ViewBag.SortParam = sortBy;
+            ViewBag.Filter = filter;
 
             _page.CurrentPageIndex = pageNumber;
             _sort.SortBy = sortBy;
             _filter.FilterString = filter;
 
-            var tmp = await _make.FindAsync(_filter, _page, _sort);
-            var dto = _mapper.Map<PageModelDTO<VehicleMakeDTO>>(tmp);
-
-            //PageModel<VehicleMake> result = await _make.FindAsync(_filter, _page, _sort);
+            var dto = _mapper.Map<PageModelDTO<VehicleMakeDTO>>(await _make.FindAsync(_filter, _page, _sort));
             return View(dto);
         }
 

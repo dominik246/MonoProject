@@ -35,6 +35,8 @@ namespace Project.Service.DataAccess
                 "Id_desc" => query.OrderBy(s => s.Id),
                 "Name_desc" => query.OrderByDescending(s => s.Name),
                 "Abrv_desc" => query.OrderByDescending(s => s.Abrv),
+                "Make" => query.OrderBy(s => s.SelectedVehicleMake.Name),
+                "Make_desc" => query.OrderByDescending(s => s.SelectedVehicleMake.Name),
                 _ => query.OrderBy(s => s.Name),
             };
         }
@@ -43,18 +45,14 @@ namespace Project.Service.DataAccess
         {
             if (string.IsNullOrEmpty(filter?.FilterString))
                 return query;
-            if (typeof(T).IsAssignableFrom(typeof(VehicleModel)))
+            if (typeof(T).GetProperty("SelectedVehicleMake") != null)
             {
-                var concreteQueryable = query.Cast<VehicleModel>().Where(q => q.Abrv.Contains(filter.FilterString) ||
-                q.Name.Contains(filter.FilterString) ||
-                q.SelectedVehicleMake.Name.Contains(filter.FilterString));
-                return concreteQueryable.Cast<T>();
+                return query.Where(q => q.Abrv.Contains(filter.FilterString) || q.Name.Contains(filter.FilterString) || q.SelectedVehicleMake.Name.Contains(filter.FilterString));
             }
             else
             {
                 return query.Where(q => q.Abrv.Contains(filter.FilterString) || q.Name.Contains(filter.FilterString));
             }
-
         }
 
         /// <summary>

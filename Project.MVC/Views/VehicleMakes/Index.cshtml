@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Index";
+    string filter = ViewBag.Filter ?? "";
+    string sortBy = ViewBag.SortParam;
 }
 
 <h1>Index</h1>
@@ -13,7 +15,7 @@
 @using (Html.BeginForm())
 {
     <p>
-        Find: @Html.TextBox("filter")
+        Find: @Html.TextBox("filter", filter)
         <input type="submit" value="Search" />
     </p>
 }
@@ -22,10 +24,10 @@
     <thead>
         <tr>
             <th>
-                @Html.ActionLink("Make name", "Index", new { sortBy = ViewBag.NameSortParam, currentFilter = ViewBag.CurrentFilter })
+                @Html.ActionLink("Make name", "Index", new { sortBy = ViewBag.SortParam == "Name_desc" ? "Name" : "Name_desc", filter = ViewBag.Filter }, htmlAttributes: false)
             </th>
             <th>
-                @Html.ActionLink("Abbreviation", "Index", new { sortBy = ViewBag.AbrvSortParam, currentFilter = ViewBag.CurrentFilter })
+                @Html.ActionLink("Abbreviation", "Index", new { sortBy = ViewBag.SortParam == "Abrv_desc" ? "Abrv" : "Abrv_desc", filter = ViewBag.Filter }, htmlAttributes: false)
             </th>
             <th></th>
         </tr>
@@ -60,16 +62,16 @@
 }
 
 <a asp-action="Index"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-sortBy="@ViewData["sortBy"]"
    asp-route-pageNo="@(Model.CurrentPageIndex - 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   asp-route-filter="@ViewData["filter"]"
    class="btn btn-default @prevDisabled">
     Previous
 </a>
 <a asp-action="Index"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-sortBy="@ViewData["sortBy"]"
    asp-route-pageNo="@(Model.CurrentPageIndex + 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   asp-route-filter="@ViewData["filter"]"
    class="btn btn-default @nextDisabled">
     Next
 </a>
