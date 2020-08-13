@@ -1,4 +1,4 @@
-﻿@model Project.Service.Models.PageModel<Project.Service.Models.VehicleModel>
+﻿@model Project.MVC.Models.PageModelDTO<Project.MVC.Models.VehicleModelDTO>
 
 @{
     ViewData["Title"] = "Index";
@@ -34,7 +34,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.ListResult)
+        @foreach (var item in Model.QueryResult)
         {
             <tr>
                 <td>

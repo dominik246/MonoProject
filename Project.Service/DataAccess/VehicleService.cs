@@ -9,7 +9,6 @@ namespace Project.Service.DataAccess
     public class VehicleService<TModel> : IVehicleService<TModel> where TModel : class, IVehicle
     {
         private readonly IServiceDBContext _db;
-
         public VehicleService(IServiceDBContext db)
         {
             _db = db;
@@ -21,7 +20,7 @@ namespace Project.Service.DataAccess
             page.QueryResult = await Task.FromResult(_db.Set<TModel>().IncludeAll(_db)
                 .GetSorted(sort).GetFiltered(filter).AsNoTracking());
 
-            if(page.ReturnPaged)
+            if (page.ReturnPaged)
             {
                 page.CurrentRowCount = page.QueryResult.Count();
                 page.QueryResult = page.QueryResult.GetPaged(page).QueryResult;

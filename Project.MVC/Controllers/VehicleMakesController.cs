@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
 
+using Microsoft.AspNetCore.Mvc;
+
+using Project.MVC.Models;
 using Project.Service.DataAccess;
 using Project.Service.Models;
 
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Project.MVC.Controllers
@@ -15,13 +16,15 @@ namespace Project.MVC.Controllers
         private readonly PageModel<VehicleMake> _page;
         private readonly FilterModel _filter;
         private readonly SortModel _sort;
+        private readonly IMapper _mapper;
 
-        public VehicleMakesController(IVehicleService<VehicleMake> make, PageModel<VehicleMake> page, FilterModel filter, SortModel sort)
+        public VehicleMakesController(IVehicleService<VehicleMake> make, PageModel<VehicleMake> page, FilterModel filter, SortModel sort, IMapper mapper)
         {
             _make = make;
             _page = page;
             _filter = filter;
             _sort = sort;
+            _mapper = mapper;
         }
 
         // GET: VehicleMakes
@@ -38,7 +41,7 @@ namespace Project.MVC.Controllers
                 filter = currentFilter;
             }
 
-            if(!string.IsNullOrEmpty(sortBy))
+            if (!string.IsNullOrEmpty(sortBy))
             {
                 if (sortBy.Contains("_desc"))
                 {
@@ -59,8 +62,11 @@ namespace Project.MVC.Controllers
             _sort.SortBy = sortBy;
             _filter.FilterString = filter;
 
-            PageModel<VehicleMake> result = await _make.FindAsync(_filter, _page, _sort);
-            return View(result);
+            var tmp = await _make.FindAsync(_filter, _page, _sort);
+            var dto = _mapper.Map<PageModelDTO<VehicleMakeDTO>>(tmp);
+
+            //PageModel<VehicleMake> result = await _make.FindAsync(_filter, _page, _sort);
+            return View(dto);
         }
 
         // GET: VehicleMakes/Details/5
@@ -70,14 +76,13 @@ namespace Project.MVC.Controllers
             {
                 return NotFound();
             }
-
-            var vehicleMake = await _make.GetAsync(id);
-            if (vehicleMake == null)
+            var dto = _mapper.Map<VehicleMakeDTO>(await _make.GetAsync(id));
+            if (dto == null)
             {
                 return NotFound();
             }
 
-            return View(vehicleMake);
+            return View(dto);
         }
 
         // GET: VehicleMakes/Create
@@ -91,11 +96,12 @@ namespace Project.MVC.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Abrv")] VehicleMake vehicleMake)
+        public async Task<IActionResult> Create([Bind("Id,Name,Abrv")] VehicleMakeDTO vehicleMake)
         {
             if (ModelState.IsValid)
             {
-                await _make.CreateAsync(vehicleMake);
+                var dto = _mapper.Map<VehicleMake>(vehicleMake);
+                await _make.CreateAsync(dto);
                 return RedirectToAction(nameof(Index));
             }
             return View(vehicleMake);
@@ -108,13 +114,13 @@ namespace Project.MVC.Controllers
             {
                 return NotFound();
             }
+            var dto = _mapper.Map<VehicleMakeDTO>(await _make.GetAsync(id));
 
-            var vehicleMake = await _make.GetAsync(id);
-            if (vehicleMake == null)
+            if (dto == null)
             {
                 return NotFound();
             }
-            return View(vehicleMake);
+            return View(dto);
         }
 
         // POST: VehicleMakes/Edit/5
@@ -122,7 +128,7 @@ namespace Project.MVC.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Abrv")] VehicleMake vehicleMake)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Abrv")] VehicleMakeDTO vehicleMake)
         {
             if (id != vehicleMake.Id)
             {
@@ -131,7 +137,8 @@ namespace Project.MVC.Controllers
 
             if (ModelState.IsValid)
             {
-                await _make.UpdateAsync(vehicleMake);
+                var dto = _mapper.Map<VehicleMake>(vehicleMake);
+                await _make.UpdateAsync(dto);
                 return RedirectToAction(nameof(Index));
             }
             return View(vehicleMake);
@@ -145,13 +152,13 @@ namespace Project.MVC.Controllers
                 return NotFound();
             }
 
-            var vehicleMake = await _make.GetAsync(id);
-            if (vehicleMake == null)
+            var dto = _mapper.Map<VehicleMakeDTO>(await _make.GetAsync(id));
+            if (dto == null)
             {
                 return NotFound();
             }
 
-            return View(vehicleMake);
+            return View(dto);
         }
 
         // POST: VehicleMakes/Delete/5

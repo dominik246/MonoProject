@@ -1,12 +1,12 @@
 ﻿
 using System;
-using System.Linq;
+using System.Collections.Generic;
 
-namespace Project.Service.Models
+namespace Project.MVC.Models
 {
-    public class PageModel<T>
+    public class PageModelDTO<T>
     {
-        public IQueryable<T> QueryResult { get; set; }
+        public IEnumerable<T> QueryResult { get; set; }
 
         public int CurrentPageIndex { get; set; }
         public int TotalPageCount { get; set; }
@@ -15,7 +15,6 @@ namespace Project.Service.Models
 
         public int FirstRowOnPage
         {
-
             get { return ((CurrentPageIndex - 1) * CurrentPageSize) + 1; }
         }
 
@@ -39,7 +38,5 @@ namespace Project.Service.Models
                 return CurrentPageIndex < TotalPageCount;
             }
         }
-
-        public bool ReturnPaged { get; set; } = true;
     }
 }

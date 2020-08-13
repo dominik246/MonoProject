@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
 
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+using Project.MVC.Models;
 using Project.Service.DataAccess;
 using Project.Service.Models;
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Project.MVC.Controllers
@@ -18,14 +18,16 @@ namespace Project.MVC.Controllers
         private readonly PageModel<VehicleModel> _pageModel;
         private readonly FilterModel _filter;
         private readonly SortModel _sort;
+        private readonly IMapper _mapper;
 
-        public VehicleModelsController(IVehicleService<VehicleModel> model, IVehicleService<VehicleMake> make, PageModel<VehicleModel> page, FilterModel filter, SortModel sort)
+        public VehicleModelsController(IVehicleService<VehicleModel> model, IVehicleService<VehicleMake> make, PageModel<VehicleModel> page, FilterModel filter, SortModel sort, IMapper mapper)
         {
             _model = model;
             _make = make;
             _pageModel = page;
             _filter = filter;
             _sort = sort;
+            _mapper = mapper;
         }
 
         // GET: VehicleModels
@@ -64,8 +66,8 @@ namespace Project.MVC.Controllers
             ViewBag.NameSortParam = sortBy == "Name" ? "Name_desc" : "Name";
             ViewBag.AbrvSortParam = sortBy == "Abrv" ? "Abrv_desc" : "Abrv";
 
-            PageModel<VehicleModel> result = await _model.FindAsync(_filter, _pageModel, _sort);
-            return View(result);
+            var dto = _mapper.Map<PageModelDTO<VehicleModelDTO>>(await _model.FindAsync(_filter, _pageModel, _sort));
+            return View(dto);
         }
 
         // GET: VehicleModels/Details/5
@@ -76,21 +78,21 @@ namespace Project.MVC.Controllers
                 return NotFound();
             }
 
-            var vehicleModel = await _model.GetAsync(id);
+            var dto = _mapper.Map<VehicleModelDTO>(await _model.GetAsync(id));
 
-            if (vehicleModel == null)
+            if (dto == null)
             {
                 return NotFound();
             }
 
-            return View(vehicleModel);
+            return View(dto);
         }
 
         // GET: VehicleModels/Create
         public async Task<IActionResult> Create()
         {
-            var result = await _make.FindAsync(_filter, null, _sort);
-            var list = result.ListResult;
+            var dto = _mapper.Map<PageModelDTO<VehicleMakeDTO>>(await _make.FindAsync(_filter, null, _sort));
+            var list = dto.QueryResult;
             ViewData["MakeId"] = new SelectList(list, "Id", "Name");
             return View();
         }
@@ -100,16 +102,14 @@ namespace Project.MVC.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,MakeId,Name,Abrv")] VehicleModel vehicleModel)
+        public async Task<IActionResult> Create([Bind("Id,MakeId,Name,Abrv")] VehicleModelDTO vehicleModel)
         {
             if (ModelState.IsValid)
             {
-                await _model.CreateAsync(vehicleModel);
+                var dto = _mapper.Map<VehicleModel>(vehicleModel);
+                await _model.CreateAsync(dto);
                 return RedirectToAction(nameof(Index));
             }
-            var result = await _make.FindAsync(_filter, null, _sort);
-            var list = result.ListResult;
-            ViewData["MakeId"] = new SelectList(list, "Id", "Name");
             return View(vehicleModel);
         }
 
@@ -121,15 +121,15 @@ namespace Project.MVC.Controllers
                 return NotFound();
             }
 
-            var vehicleModel = await _model.GetAsync(id);
-            if (vehicleModel == null)
+            var dto = _mapper.Map<VehicleModelDTO>(await _model.GetAsync(id));
+            if (dto == null)
             {
                 return NotFound();
             }
-            var result = await _make.FindAsync(_filter, null, _sort);
-            var list = result.ListResult;
+            var pagedDto = _mapper.Map<PageModelDTO<VehicleMakeDTO>>(await _make.FindAsync(_filter, null, _sort));
+            var list = pagedDto.QueryResult;
             ViewData["MakeId"] = new SelectList(list, "Id", "Name");
-            return View(vehicleModel);
+            return View(dto);
         }
 
         // POST: VehicleModels/Edit/5
@@ -137,22 +137,20 @@ namespace Project.MVC.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,MakeId,Name,Abrv")] VehicleModel vehicleModel)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,MakeId,Name,Abrv")] VehicleModelDTO vehicleModel)
         {
-            if (id != vehicleModel.Id)
+            var dto = _mapper.Map<VehicleModel>(vehicleModel);
+            if (id != dto.Id)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                await _model.UpdateAsync(vehicleModel);
+                await _model.UpdateAsync(dto);
                 return RedirectToAction(nameof(Index));
             }
-            var result = await _make.FindAsync(_filter, null, _sort);
-            var list = result.ListResult;
-            ViewData["MakeId"] = new SelectList(list, "Id", "Name");
-            return View(vehicleModel);
+            return View(dto);
         }
 
         // GET: VehicleModels/Delete/5
@@ -163,14 +161,14 @@ namespace Project.MVC.Controllers
                 return NotFound();
             }
 
-            var vehicleModel = await _model.GetAsync(id);
+            var dto = _mapper.Map<VehicleModelDTO>(await _model.GetAsync(id));
 
-            if (vehicleModel == null)
+            if (dto == null)
             {
                 return NotFound();
             }
 
-            return View(vehicleModel);
+            return View(dto);
         }
 
         // POST: VehicleModels/Delete/5

@@ -2,8 +2,6 @@
 
 using Project.Service.Models;
 
-using System.Threading.Tasks;
-
 namespace Project.Service.DataAccess
 {
     public class ServiceDBContext : DbContext, IServiceDBContext
